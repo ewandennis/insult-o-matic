@@ -4,6 +4,7 @@ import wordset
 
 LEXICON = 'vendor/subjLexicon.json'
 CACHE = 'insultIngredients.cache'
+VERY_BAD_NOUNS = ['bastard']
 
 # include in the cache the lexicon and dictionary records used to build the ingredients
 DEBUG = False
@@ -22,17 +23,22 @@ def posTag(words, wordSetPos, subjPos):
 def lightenUp(words):
     return [dict(word=word['word']) for word in words]
 
+def exclude(comparator, lst):
+    return list(filter(comparator, lst))
+
 def buildInsultIngredients():
     lexicon = json.load(open(LEXICON))
 
     posTag(lexicon, 'adjective', 'adj')
     posTag(lexicon, 'noun', 'noun')
 
-    realWords = list(filter(lambda word: word['_wordSet'] is not None, lexicon))
-    badWords = list(filter(lambda word: word['sentiment'] == 'negative', realWords))
-    badAdjectives = list(filter(lambda word: word['partOfSpeech'] == 'adj' and word['partOfSpeech2'] == 'adj', badWords))
-    badNouns = list(filter(lambda word: word['partOfSpeech'] == 'noun' and word['partOfSpeech2'] == 'noun', badWords))
-    badSingularNouns = list(filter(lambda word: word['word'][-2:] != 'es', badNouns))
+    realWords = exclude(lambda word: word['_wordSet'] is not None, lexicon)
+    badWords = exclude(lambda word: word['sentiment'] == 'negative', realWords)
+    badAdjectives = exclude(lambda word: word['partOfSpeech'] == 'adj' and word['partOfSpeech2'] == 'adj', badWords)
+    badNouns = exclude(lambda word: word['partOfSpeech'] == 'noun' and word['partOfSpeech2'] == 'noun', badWords)
+    badSingularNouns = exclude(lambda word: word['word'][-2:] != 'es', badNouns)
+
+    badSingularNouns = exclude(lambda word: word['word'].lower() not in VERY_BAD_NOUNS, badSingularNouns)
 
     badAdjectives = list(badAdjectives)
     badSingularNouns = list(badSingularNouns)
@@ -45,7 +51,7 @@ def buildInsultIngredients():
 
 if not os.path.isfile(CACHE):
     badAdjectives, badSingularNouns = buildInsultIngredients()
-    json.dump(dict(badAdjectives=badAdjectives, badSingularNouns=badSingularNouns), open(CACHE, 'w'))
+    json.dump(dict(badAdjectives=badAdjectives, badSingularNouns=badSingularNouns), open(CACHE, 'w'), indent=2)
 else:
     cache = json.load(open(CACHE))
     badAdjectives = cache['badAdjectives']
