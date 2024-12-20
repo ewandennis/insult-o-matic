@@ -14,7 +14,7 @@
 
 `python insultMe.py`
 
-On first run, it build build insult ingredients and cache to insultIngredients.cache. On future runs, it will reuse the cache.
+On first run, it builds insult ingredients and caches them to `insultIngredients.cache` as JSON. On future runs, it reuses the cache.
 
 ## Sample Output
 
