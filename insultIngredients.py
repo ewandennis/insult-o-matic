@@ -1,6 +1,5 @@
-import os.path
+import os
 import json
-import wordset
 
 LEXICON = 'vendor/subjLexicon.json'
 CACHE = 'insultIngredients.cache'
@@ -10,6 +9,7 @@ VERY_BAD_NOUNS = ['bastard']
 DEBUG = False
 
 def posTag(words, wordSetPos, subjPos):
+    import wordset
     for word in words:
         dictResult = wordset.lookup(word['word'])
         if dictResult:
@@ -21,12 +21,12 @@ def posTag(words, wordSetPos, subjPos):
         word['_wordSet'] = dictResult
 
 def lightenUp(words):
-    return [dict(word=word['word']) for word in words]
+    return [word['word'] for word in words]
 
 def exclude(comparator, lst):
     return list(filter(comparator, lst))
 
-def buildInsultIngredients():
+def _buildInsultIngredients(lightMode):
     lexicon = json.load(open(LEXICON))
 
     posTag(lexicon, 'adjective', 'adj')
@@ -43,17 +43,24 @@ def buildInsultIngredients():
     badAdjectives = list(badAdjectives)
     badSingularNouns = list(badSingularNouns)
 
-    if not DEBUG:
+    if lightMode:
         badAdjectives = lightenUp(badAdjectives)
         badSingularNouns = lightenUp(badSingularNouns)
 
     return badAdjectives, badSingularNouns
 
-if not os.path.isfile(CACHE):
-    badAdjectives, badSingularNouns = buildInsultIngredients()
-    json.dump(dict(badAdjectives=badAdjectives, badSingularNouns=badSingularNouns), open(CACHE, 'w'), indent=2)
-else:
-    cache = json.load(open(CACHE))
-    badAdjectives = cache['badAdjectives']
-    badSingularNouns = cache['badSingularNouns']
+def loadIngredients(lightMode=True, forceRebuild=False):
+    if forceRebuild:
+        os.remove(CACHE)
+
+    try:
+        cache = json.load(open(CACHE))
+        badAdjectives = cache['badAdjectives']
+        badSingularNouns = cache['badSingularNouns']
+    except Exception as e:
+        badAdjectives, badSingularNouns = _buildInsultIngredients(lightMode)
+        kwargs = {} if lightMode else {"indent": 2}
+        json.dump(dict(badAdjectives=badAdjectives, badSingularNouns=badSingularNouns), open(CACHE, 'w'), **kwargs)
+
+    return badAdjectives, badSingularNouns
 
