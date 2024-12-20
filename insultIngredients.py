@@ -26,13 +26,16 @@ def lightenUp(words):
 def exclude(comparator, lst):
     return list(filter(comparator, lst))
 
-def _buildInsultIngredients(lightMode):
+def _buildInsultIngredients(lightMode, maxWordLen):
     lexicon = json.load(open(LEXICON))
 
     posTag(lexicon, 'adjective', 'adj')
     posTag(lexicon, 'noun', 'noun')
 
-    realWords = exclude(lambda word: word['_wordSet'] is not None, lexicon)
+    if maxWordLen is not None:
+        shortWords = exclude(lambda word: len(word['word']) <= maxWordLen, lexicon)
+
+    realWords = exclude(lambda word: word['_wordSet'] is not None, shortWords)
     badWords = exclude(lambda word: word['sentiment'] == 'negative', realWords)
     badAdjectives = exclude(lambda word: word['partOfSpeech'] == 'adj' and word['partOfSpeech2'] == 'adj', badWords)
     badNouns = exclude(lambda word: word['partOfSpeech'] == 'noun' and word['partOfSpeech2'] == 'noun', badWords)
@@ -40,16 +43,13 @@ def _buildInsultIngredients(lightMode):
 
     badSingularNouns = exclude(lambda word: word['word'].lower() not in VERY_BAD_NOUNS, badSingularNouns)
 
-    badAdjectives = list(badAdjectives)
-    badSingularNouns = list(badSingularNouns)
-
     if lightMode:
         badAdjectives = lightenUp(badAdjectives)
         badSingularNouns = lightenUp(badSingularNouns)
 
     return badAdjectives, badSingularNouns
 
-def loadIngredients(lightMode=True, forceRebuild=False):
+def loadIngredients(lightMode=True, forceRebuild=False, maxWordLen=None):
     if forceRebuild:
         os.remove(CACHE)
 
@@ -58,7 +58,7 @@ def loadIngredients(lightMode=True, forceRebuild=False):
         badAdjectives = cache['badAdjectives']
         badSingularNouns = cache['badSingularNouns']
     except Exception as e:
-        badAdjectives, badSingularNouns = _buildInsultIngredients(lightMode)
+        badAdjectives, badSingularNouns = _buildInsultIngredients(lightMode, maxWordLen)
         kwargs = {} if lightMode else {"indent": 2}
         json.dump(dict(badAdjectives=badAdjectives, badSingularNouns=badSingularNouns), open(CACHE, 'w'), **kwargs)
 

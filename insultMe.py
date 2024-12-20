@@ -3,16 +3,15 @@ import random
 import insultIngredients
 
 DEBUG = False
-LIGHTMODE = True
+MAX_WORD_LEN=8
 
-def wordFromObj(w):
-    return w if LIGHTMODE else w['word']
-
-def insultme():
+def insultme(badAdjectives, badSingularNouns, lightMode=True):
     def pickWord(library):
         return library[random.randrange(len(library))]
 
-    badAdjectives, badSingularNouns = insultIngredients.loadIngredients(LIGHTMODE)
+    def wordFromObj(w):
+        return w if lightMode else w['word']
+
     adj = pickWord(badAdjectives)
     noun = pickWord(badSingularNouns)
     article = 'an' if wordFromObj(adj)[0] in 'aeiou' else 'a'
@@ -26,4 +25,5 @@ def insultme():
     return insult
 
 if __name__ == '__main__':
-    print(insultme())
+    badAdjectives, badSingularNouns = insultIngredients.loadIngredients(lightMode=True, maxWordLen=MAX_WORD_LEN)
+    print(insultme(badAdjectives, badSingularNouns))
