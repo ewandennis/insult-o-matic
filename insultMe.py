@@ -10,8 +10,11 @@ def insultme():
 
     adj = pickWord(insultIngredients.badAdjectives)
     noun = pickWord(insultIngredients.badSingularNouns)
-    insult = 'You are a ' + adj['word'] + ' ' + noun['word']
+    article = 'an' if adj['word'][0] in 'aeiou' else 'a'
+    insult = 'You are ' + article + ' ' + adj['word'] + ' ' + noun['word']
     if DEBUG:
+        print('adjectives: {}'.format(len(insultIngredients.badAdjectives)))
+        print('nouns: {}'.format(len(insultIngredients.badSingularNouns)))
         print(json.dumps(adj, indent=2))
         print(json.dumps(noun, indent=2))
 

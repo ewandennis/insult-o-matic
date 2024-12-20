@@ -16,6 +16,15 @@
 
 On first run, it build build insult ingredients and cache to insultIngredients.cache. On future runs, it will reuse the cache.
 
+## Sample Output
+
+- You are a haughty malevolence
+- You are a coercive recklessness
+- You are a dreary slur
+- You are an unspecified insouciance
+
+With roughly 1000 adjectives and 1000 nouns, it should offer 1,000,000 insults of highly variable quality.
+
 ## Licensing
 
 <p xmlns:cc="http://creativecommons.org/ns#" xmlns:dct="http://purl.org/dc/terms/"><a property="dct:title" rel="cc:attributionURL" href="https://github.com/ewandennis/insult-o-matic">Insult-o-matic</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://github.com/ewandennis/">Ewan Dennis</a> is licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY-SA 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/sa.svg?ref=chooser-v1" alt=""></a></p>
